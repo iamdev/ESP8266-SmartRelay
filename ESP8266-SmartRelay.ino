@@ -12,7 +12,7 @@
 #define USE_LCD_1602
 #define USE_DHT22
 #define BLYNK_MSG_LIMIT 250
-#define PCF8574_I2C_ADDR 0x20 /*0x38*/
+#define PCF8574_I2C_ADDR 0x20 /*0x38|0x20,0x39|0x21*/
 
 #ifndef LED_BUILTIN
   #define LED_BUILTIN 2
@@ -256,17 +256,17 @@ unsigned long last_get_rssi;
 
 BLYNK_READ(V5){  
   Blynk.virtualWrite(V5, WiFi.RSSI()); //sending to Blynk
-  last_get_temp = millis();
+  last_get_rssi  = millis();
 }
 
 BLYNK_READ(V6){  
   Blynk.virtualWrite(V6,temperature ); //sending to Blynk
-  last_get_humi = millis();
+  last_get_temp = millis();
 }
 
 BLYNK_READ(V7){  
   Blynk.virtualWrite(V7, humidity); //sending to Blynk
-  last_get_rssi = millis();
+  last_get_humi = millis();
 }
 
 
