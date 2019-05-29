@@ -86,8 +86,9 @@ byte DateTime::dayOfWeek() {   // y > 1752, 1 <= m <= 12
   return ((year + year/4 - year/100 + year/400 + t[month-1] + day) % 7) + 1; // 01 - 07, 01 = Sunday
 }
 
- DateTime:: operator time_t(){
+DateTime:: operator time_t(){
     static int monthdays[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+	if(year<1970) return 0;
     int yd = year-1970;
     long days = ((yd)*365) + ((yd+2)/4) + (day-1);
     for(int i = 0;i<month;i++) days+=monthdays[i];
@@ -221,11 +222,12 @@ DateTime SimpleRTC::now()
         } else
             TimeDate[i] = bcdtodec(n);
     }
-
+	//Serial.printf("Century = %d, Year = %d\n",century,TimeDate[6]);
+	
     if (century == 1) {
         year_full = 2000 + TimeDate[6];
     } else {
-        year_full = 1900 + TimeDate[6];
+		year_full = 1900 + TimeDate[6];
     }
     return DateTime(year_full,TimeDate[5],TimeDate[4],TimeDate[2],TimeDate[1],TimeDate[0]);
 }
@@ -279,6 +281,8 @@ void SimpleRTC::setLocal(DateTime t){
   setLocal((time_t)t);
 }
 void SimpleRTC::setLocal(time_t t){
+//  Serial.print("Set local (unixtime):");
+//  Serial.println(t);
   timeoffset = t - (millis()/1000);
 }
 

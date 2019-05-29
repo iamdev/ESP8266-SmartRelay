@@ -77,7 +77,7 @@ void setup() {
   rtc.setLocal();
   Serial.print("RTC Date/Time : ");
   printDateTime(now());
-  
+  Serial.println();
 
   #ifdef USE_LCD_1602 
   setup_lcd();
