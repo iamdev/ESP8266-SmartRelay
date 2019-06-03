@@ -39,8 +39,8 @@ void ipToCharArray(IPAddress ip,char*ipStr){
   }
 }
 
-void handle_WebConfig(){
-    Serial.printf("Enter AP Config Mode...\n");  
+void handle_WebConfig(){  
+  Serial.printf("Enter AP Config Mode...\n");  
   for(int i=0;i<3;i++){
     digitalWrite(LED_BUILTIN, HIGH);
     delay(200);

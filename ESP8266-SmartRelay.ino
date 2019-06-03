@@ -96,7 +96,13 @@ void setup() {
     eeprom.write(APP_DATA_ADDRESS,&appData,sizeof(AppData_t));
   });
   eeprom.read(APP_DATA_ADDRESS,&appData,sizeof(AppData_t));
-  if(appSetting.config.wifi_ssid[0] == 0) handle_WebConfig();  
+  if(appSetting.config.wifi_ssid[0] == 0) 
+  {
+    #ifdef USE_LCD_1602
+    displayConfigMode();
+    #endif
+    handle_WebConfig();  
+  }
   config = appSetting.config;
   #ifdef DEBUG
   printSetting();
@@ -134,6 +140,9 @@ void setup() {
   /******************************************/ 
   btn.begin(LOW,200,50);
   btn.onPressed([]{
+    #ifdef USE_LCD_1602
+    displayConfigMode();
+    #endif
     handle_WebConfig();
   });
   /*monitor button pressed*/
@@ -270,8 +279,11 @@ BLYNK_READ(V7){
 }
 
 
-BLYNK_WRITE(V8){
+BLYNK_WRITE(V99){
   if (!param.asInt()){
+      #ifdef USE_LCD_1602
+      displayConfigMode();
+      #endif
       handle_WebConfig();
   }
 }

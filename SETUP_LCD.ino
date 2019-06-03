@@ -5,6 +5,15 @@ const uint8_t i2c_lcd_scan_address[] = {0x27,0x3F};
 LiquidCrystal_I2C lcd;  
 void task_update_clock();
 
+void displayConfigMode(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("[AP Config Mode]");
+  lcd.setCursor(0,1);
+  lcd.print("SSID:");
+  lcd.print(getEspName().c_str());
+}
+
 void setup_lcd(){
   bool found_lcd =false;
   for(int i=0;i<sizeof(i2c_lcd_scan_address);i++){
