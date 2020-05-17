@@ -2,7 +2,8 @@
 #define APP_SETTING_H
 
 /*Define to store config in EEPROM, otherwise store in Internal Flase*/
-#define CONFIG_STORAGE_EEPROM
+//#define CONFIG_STORAGE_EEPROM
+#define LOCAL_TIME_BASE
 
 #include "src/webconfig.h"
 #include <IPAddress.h>

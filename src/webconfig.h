@@ -17,7 +17,6 @@
 /*Define to store config in EEPROM, otherwise store in Internal Flase*/
 #ifdef CONFIG_STORAGE_EEPROM
 #include "eeprom.h"
-EasyEEPROM eeprom;
 #else
 #include <EEPROM.h>
 #endif

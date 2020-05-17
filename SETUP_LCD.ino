@@ -1,9 +1,9 @@
 #ifdef USE_LCD_1602
 //I2C LCD Address 0x27 or 0x3F
 const uint8_t i2c_lcd_scan_address[] = {0x27,0x3F};
-#include "src/LiquidCrystal_I2C.h"
-LiquidCrystal_I2C lcd;  
 void task_update_clock();
+bool _lcd_status = false;
+bool LCDStatus(){return _lcd_status;}
 
 void displayConfigMode(){
   lcd.clear();
@@ -13,7 +13,6 @@ void displayConfigMode(){
   lcd.print("SSID:");
   lcd.print(getEspName().c_str());
 }
-
 void setup_lcd(){
   bool found_lcd =false;
   for(int i=0;i<sizeof(i2c_lcd_scan_address);i++){
@@ -28,8 +27,10 @@ void setup_lcd(){
   }
   if(!found_lcd){
     Serial.println("Not found lcd connected!!");
+    _lcd_status = false;
     return;
   }
+  _lcd_status = true;
   lcd.begin(16,2);
   lcd.backlight();
   lcd.clear();
@@ -68,5 +69,6 @@ void task_update_clock(){
     humi = humidity;
   }
 }
-
+#else
+bool LCDStatus(){return false;}
 #endif

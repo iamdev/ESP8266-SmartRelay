@@ -1,7 +1,9 @@
 #ifndef _SIMPLE_RTC_H
 #define _SIMPLE_RTC_H
 
+#ifndef LOCAL_TIME_BASED
 #define DS3231_TIME_BASED 
+#endif
 
 #include <Arduino.h>
 #ifdef DS3231_TIME_BASED
