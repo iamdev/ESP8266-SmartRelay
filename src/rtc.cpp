@@ -92,6 +92,7 @@ DateTime:: operator time_t(){
     int yd = year-1970;
     long days = ((yd)*365) + ((yd+2)/4) + (day-1);
     for(int i = 0;i<month;i++) days+=monthdays[i];
+    if(((yd+2)%4) == 0 && month<=2) days -=1;
     return (time_t) (((days * 24L + hour) * 60 + minute) * 60 + second);
 }
 //********************************************************************/
@@ -229,11 +230,18 @@ DateTime SimpleRTC::now()
     } else {
 		year_full = 1900 + TimeDate[6];
     }
-    return DateTime(year_full,TimeDate[5],TimeDate[4],TimeDate[2],TimeDate[1],TimeDate[0]);
+
+    DateTime dt = DateTime(year_full,TimeDate[5],TimeDate[4],TimeDate[2],TimeDate[1],TimeDate[0]);
+    if(timezone!=0){
+        time_t _tz = (time_t)dt + (timezone*3600);
+        dt = DateTime(_tz);
+    }
+    return dt;
 }
 
 void SimpleRTC::set(DateTime t)
 { 
+    setLocal(t);
     uint8_t i, century; 
     uint8_t short_year;
     if (t.year >= 2000) {
@@ -253,14 +261,21 @@ void SimpleRTC::set(DateTime t)
         _wire->write(TimeDate[i]);                
     }
     _wire->endTransmission();
-    setLocal(t);
 }
 
 void SimpleRTC::setLocal()
 {
-    setLocal(this->now());
+    DateTime t = this->now();
+    if(t.year<2000){
+        t = DateTime(2000,1,1);
+        set(t);
+    } 
+    setLocal(t);
 }
 
+void SimpleRTC::begin(){
+    setLocal();
+}
 #else
 SimpleRTC::SimpleRTC(){}
 void SimpleRTC::set(DateTime t)
@@ -269,6 +284,11 @@ void SimpleRTC::set(DateTime t)
 }
 DateTime SimpleRTC::now(){
     return localTime();
+}
+void SimpleRTC::begin(){
+}
+void SimpleRTC::setLocal()
+{
 }
 #endif
 
@@ -281,15 +301,19 @@ void SimpleRTC::setLocal(DateTime t){
   setLocal((time_t)t);
 }
 void SimpleRTC::setLocal(time_t t){
-//  Serial.print("Set local (unixtime):");
-//  Serial.println(t);
   timeoffset = t - (millis()/1000);
 }
 
 struct DateTime SimpleRTC::localTime(){
-  return DateTime(timeoffset + (millis()/1000));
+    uint32_t ms = millis();
+    if(ms < last_ms) setLocal();
+    last_ms = ms;	
+   return DateTime(timeoffset + (millis()/1000) + (timezone*3600));
 }
 
+void SimpleRTC::setTimeZone(int tz){
+    timezone = tz;
+}
 
 
 //********************************************************************/
@@ -310,15 +334,25 @@ int second(){return DateTime(now()).second;}
 void printDateTime(time_t tt,char*buf){
     printDateTime(DateTime(tt),buf);
 }
-void printDateTime(time_t tt,bool newline){
-    printDateTime(DateTime(tt),newline);
+void printDateTime(Stream *debug,time_t tt,bool newline){
+    printDateTime(debug,DateTime(tt),newline);
 }
+
 void printDateTime(DateTime dt,char*buf){
     snprintf(buf,32,"%02u/%02u/%04u %02u:%02u:%02u",dt.day,dt.month,dt.year,dt.hour,dt.minute,dt.second);      
 }
-void printDateTime(DateTime dt,bool newline){
+
+void printDateTime(Stream *debug,DateTime dt,bool newline){
     char str[32];
     printDateTime(dt,str);    
-    Serial.print(str);
-    if(newline) Serial.println();
+    debug->print(str);
+    if(newline) debug->println();
+}
+
+void printDateTime(time_t tt){
+    printDateTime(&Serial,tt);
+}
+
+void printDateTime(DateTime dt){
+	printDateTime(&Serial,dt);
 }

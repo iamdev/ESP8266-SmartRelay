@@ -20,7 +20,7 @@
 #define USE_DHT22
 #define BLYNK_MSG_LIMIT 250
 #define PCF8574_I2C_ADDR 0x20 /*0x38|0x20,0x39|0x21*/
-#define USE_SERIAL_COMMAND 
+#define USE_SERIAL_COMMAND
 
 #ifdef USE_LCD_1602 
 #include "src/LiquidCrystal_I2C.h"
@@ -77,7 +77,7 @@ float temperature, humidity;
 const int a0_buffer_size = 50;
 double a0_buffer[a0_buffer_size];
 MVRingBuffer<double> rba0(a0_buffer,a0_buffer_size);
-const int exp_input_pin[] = {4,5,6,7};
+const int exp_input_pin[] = {7,6,5,4};
 const int exp_output_pin[] = {0,1,2,3};
 bool eeprom_status = false;
 StartStopTimer sstm[4];
@@ -109,22 +109,25 @@ void setup() {
   Serial.printf("Read EEPROM address 0x00 : %02X .... ",_test);  
   if(eeprom.read(0x00)==0x3A){
     Serial.println("Pass!");
+#ifdef USE_LCD_1602     
     if(LCDStatus()){
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print("TEST EEPROM OK!");   
       delay(1000);
     }
+#endif    
     eeprom_status = true;
   }else{
     Serial.println("Fail!");
-        
+#ifdef USE_LCD_1602         
     if(LCDStatus()){
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print("EEPROM Fail!!!");        
       delay(10000);
     }
+#endif    
   }
 #endif  
   
@@ -230,7 +233,7 @@ void setup() {
     
   /*Read analog and calculate moving average*/
   Task.create([]{
-    double a = 5.2*(analogRead(A0))/1024.0;
+    double a = 5.0*(analogRead(A0))/1024.0;
     rba0.add(a);
   },10);
 
@@ -238,18 +241,20 @@ void setup() {
   cmd.registerCommand("ON",[](const char * arg){
     int n = atoi(arg);
     if(n>=1 && n<=4){
+      Serial.printf("Relay %u : ON\n",n);
       n--;
-      ex.write(n,0);      
+      ex.write(n,0);
     }
   });
   cmd.registerCommand("OFF",[](const char * arg){
     int n = atoi(arg);
     if(n>=1 && n<=4){
-      n--;
+      Serial.printf("Relay %u : OFF\n",n);
+      n--;      
       ex.write(n,1);      
     }
   });
-  Task.create([]{cmd.read();},100);
+  Task.create([]{cmd.read();},1);
   #endif
   
   /*Checking Wifi Status*/

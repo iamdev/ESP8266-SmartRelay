@@ -45,8 +45,9 @@ void setup_io_exp(){
 void onInputChanged(){
     for(int i=0;i<4;i++){
       struct InputStatus s = ex.getInputStatus(i);
-      if(s.state == INPUT_STATE_RELEASED){        
+      if(s.state == INPUT_STATE_RELEASED){           
         int n = ex.toggle(i);
+        Serial.printf("Toggle Relay %u : %s\n",i+1,n?"OFF":"ON");
       }
     }
 }

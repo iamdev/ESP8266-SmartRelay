@@ -54,6 +54,7 @@ void task_update_clock(){
     lcd.print(buf + i);
     memcpy(_buf,buf,16);
   } 
+  #ifdef USE_DHT22
   static float temp = 0;
   if(temp!=temperature){  
     snprintf(buf,16,"T:%2.1f%cC",temperature,223);
@@ -68,6 +69,16 @@ void task_update_clock(){
     lcd.print(buf);
     humi = humidity;
   }
+  #else
+  static float prev_adc =-999;
+  float v_adc = rba0.average();
+  if(v_adc!=prev_adc ){  
+    snprintf(buf,16,"A-IN:%1.2f%V.",v_adc);
+    lcd.setCursor(0,1);
+    lcd.print(buf);
+    prev_adc = v_adc;
+  }
+  #endif
 }
 #else
 bool LCDStatus(){return false;}

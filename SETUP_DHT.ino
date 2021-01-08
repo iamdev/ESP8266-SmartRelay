@@ -7,11 +7,9 @@ void setup_dht(){
     int err = SimpleDHTErrSuccess;
     if ((err = dht.read2(&temperature, &humidity, NULL)) == SimpleDHTErrSuccess) {
       if(humidity>=100)humidity=99.9f;
-      Serial.printf("Temp:%f,Humidity:%f\n",temperature,humidity);
+      Serial.printf("Temp:%.2f,Humidity:%.2f\n",temperature,humidity);
     }else{      
     }
   },1000);
 }
-
-
 #endif

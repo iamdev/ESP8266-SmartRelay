@@ -32,16 +32,19 @@ class SimpleRTC{
     #ifdef DS3231_TIME_BASED
     SimpleRTC(TwoWire *wire);
     float getTemperature();    
-    void setLocal();
     #endif
     
     SimpleRTC();
+    void begin();
+    void setTimeZone(int timezone=0);
     void set(DateTime t);
     void set(time_t t);
     void setLocal(DateTime t);
     void setLocal(time_t t);  
     struct DateTime now();
     struct DateTime localTime();
+    void setLocal();
+    
   private:
     void set_addr(const uint8_t addr, const uint8_t val);
     uint8_t get_addr(const uint8_t addr);
@@ -49,16 +52,20 @@ class SimpleRTC{
     void set_sreg(const uint8_t val);
     uint8_t get_sreg(void);
     time_t timeoffset;
+    int timezone = 0;
+    uint32_t last_ms=0;   
     #ifdef DS3231_TIME_BASED
     TwoWire *_wire;
     #endif
 };
 
 
-void printDateTime(time_t tt,bool newline=true);
+void printDateTime(Stream*,time_t tt, bool newline=true);
 void printDateTime(time_t tt,char*buf);
-void printDateTime(DateTime dt,bool newline=true);
+void printDateTime(Stream*,DateTime,bool newline=true);
 void printDateTime(DateTime dt,char*buf);
+void printDateTime(time_t tt);
+void printDateTime(DateTime dt);
 extern SimpleRTC rtc;
 
 extern time_t now();
